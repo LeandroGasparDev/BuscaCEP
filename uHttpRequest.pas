@@ -8,42 +8,47 @@ uses
 type
   THttpRequest = class
   private
-    FUrl: string;
-    FMethod: string;
-    FBody: string;
-    FContentType: string;
-    FHeaderTitle: string;
-    FHeaderValue: string;
-    FCountHeader: Integer;
+    FUrl          : string;
+    FMethod       : string;
+    FBody         : string;
+    FContentType  : string;
+    FHeaderTitle  : string;
+    FHeaderValue  : string;
+    FCountHeader  : Integer;
     FEsperaRetorno: Boolean;
-    FCodeApi: Integer;
+    FCodeApi      : Integer;
     function GetResponseText: string;
   public
-    constructor Create(const aURL: string; const aMethod: string; const aBody: string; const aContentType: string = ''; esperaRetorno: boolean = True);
-    procedure AddHeader(const HeaderTitle, HeaderValue: string);
-    function Execute: string;
     property ResponseText: string read GetResponseText;
     property CodeApi: Integer read FCodeApi;
+    constructor Create(const pURL: string; const pMethod: string; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
+    function Execute: string;
+    procedure AddHeader(const pHeaderTitle, pHeaderValue: string);
   end;
+
+function Get(const pURL: string; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
+function Post(const pURL, pBody: String; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
+function Put(const pURL, pBody: string; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
+
 implementation
 
 { THttpRequest }
 
-constructor THttpRequest.Create(const aURL, aMethod, aBody, aContentType: string; esperaRetorno: boolean);
+constructor THttpRequest.Create(const pURL: string; const pMethod: string; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
 begin
  inherited Create;
-  FUrl := aURL;
-  FMethod := aMethod;
-  FBody := aBody;
-  FContentType := aContentType;
-  FEsperaRetorno := esperaRetorno;
-  FCountHeader := 0;
+  FUrl            := pURL;
+  FMethod         := pMethod;
+  FBody           := pBody;
+  FContentType    := pContentType;
+  FEsperaRetorno  := pEsperaRetorno;
+  FCountHeader    := 0;
 end;
 
-procedure THttpRequest.AddHeader(const HeaderTitle, HeaderValue: string);
+procedure THttpRequest.AddHeader(const pHeaderTitle, pHeaderValue: string);
 begin
-  FHeaderTitle := FHeaderTitle + HeaderTitle + ';';
-  FHeaderValue := FHeaderValue + HeaderValue + ';';
+  FHeaderTitle := FHeaderTitle + pHeaderTitle + ';';
+  FHeaderValue := FHeaderValue + pHeaderValue + ';';
   Inc(FCountHeader);
  end;
 
@@ -57,7 +62,6 @@ begin
   try
     Request := CreateOleObject('WinHttp.WinHttpRequest.5.1');
     Request.Open(FMethod, FUrl, (not FEsperaRetorno));
-
     if FCountHeader > 0 then
     begin
       HeaderTitulo := TStringList.Create;
@@ -65,31 +69,24 @@ begin
       try
         HeaderTitulo.Delimiter := ';';
         HeaderTitulo.DelimitedText := FHeaderTitle;
-
         HeaderValor.Delimiter := ';';
         HeaderValor.DelimitedText := FHeaderValue;
-
         for i := 0 to FCountHeader - 1 do
-        begin
           Request.SetRequestHeader(Trim(HeaderTitulo.Strings[i]), Trim(HeaderValor.Strings[i]));
-        end;
       finally
         HeaderTitulo.Free;
         HeaderValor.Free;
       end;
     end;
-
     Request.SetRequestHeader('Content-Type', FContentType);
     Request.Send(FBody);
-
     if not FEsperaRetorno then
-      Exit('');
+      Exit;
 
     if Request.Status < 205 then
       FCodeApi := 200
     else
       FCodeApi := Request.Status;
-
     Result := Request.ResponseText;
   finally
     Request := Unassigned;
@@ -101,5 +98,43 @@ function THttpRequest.GetResponseText: string;
 begin
  Result := Execute;
 end;
+
+{ Funções externas  - THttpRequest }
+function Get(const pURL: string; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
+var
+  HttpRequest: THttpRequest;
+begin
+  HttpRequest := THttpRequest.Create(pURL, 'GET', '', pContentType, pEsperaRetorno);
+  try
+    Result := HttpRequest.Execute;
+  finally
+    HttpRequest.Free;
+  end;
+end;
+
+function Post(const pURL, pBody: String; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
+var
+  HttpRequest: THttpRequest;
+begin
+  HttpRequest := THttpRequest.Create(pURL, 'POST', pBody, pContentType, pEsperaRetorno);
+  try
+    Result := HttpRequest.Execute;
+  finally
+    HttpRequest.Free;
+  end;
+end;
+
+function Put(const pURL, pBody: string; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
+var
+  HttpRequest: THttpRequest;
+begin
+  HttpRequest := THttpRequest.Create(pURL, 'PUT', pBody, pContentType, pEsperaRetorno);
+  try
+    Result := HttpRequest.Execute;
+  finally
+    HttpRequest.Free;
+  end;
+end;
+
 
 end.

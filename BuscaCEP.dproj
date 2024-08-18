@@ -99,9 +99,10 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="uCEP.pas">
-            <Form>Form1</Form>
+            <Form>frmBuscaCep</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uHttpRequest.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

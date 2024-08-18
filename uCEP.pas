@@ -31,7 +31,6 @@ uses uFuncoes, uHttpRequest;
 procedure TfrmBuscaCep.btnBuscarCepClick(Sender: TObject);
 var
   CEP, url     : String;
-  HttpRequest  : THttpRequest;
   Response     : string;
   objRetorno   : ISuperObject;
 begin
@@ -46,14 +45,12 @@ begin
 
   url := 'https://viacep.com.br/ws/'+CEP+'/'+'json'+'/';
   try
-    HttpRequest  := THttpRequest.Create(url,'GET','','application/json',True);
-    Response     := HttpRequest.Execute;
+    Response     := Get(url);
 
     objRetorno    := SO(Utf8ToAnsi(Response));
     mmResult.Text := (objRetorno.AsJSon(True));
-
   finally
-    HttpRequest.Free;
+
   end;
 end;
 
