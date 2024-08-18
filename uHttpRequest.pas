@@ -36,7 +36,6 @@ implementation
 
 constructor THttpRequest.Create(const pURL: string; const pMethod: string; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
 begin
- inherited Create;
   FUrl            := pURL;
   FMethod         := pMethod;
   FBody           := pBody;
