@@ -1,7 +1,6 @@
-object Form1: TForm1
+object frmBuscaCep: TfrmBuscaCep
   Left = 0
   Top = 0
-  Caption = 'Form1'
   ClientHeight = 527
   ClientWidth = 534
   Color = clBtnFace
@@ -40,7 +39,7 @@ object Form1: TForm1
     TabOrder = 0
     Text = '     -   '
   end
-  object BitBtn1: TBitBtn
+  object btnBuscarCep: TBitBtn
     Left = 277
     Top = 8
     Width = 121
@@ -53,7 +52,7 @@ object Form1: TForm1
     Font.Style = []
     ParentFont = False
     TabOrder = 1
-    OnClick = BitBtn1Click
+    OnClick = btnBuscarCepClick
   end
   object mmResult: TMemo
     Left = 8
