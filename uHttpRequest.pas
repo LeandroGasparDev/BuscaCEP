@@ -23,7 +23,6 @@ type
     property CodeApi: Integer read FCodeApi;
     constructor Create(const pURL: string; const pMethod: string; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
     function Execute: string;
-    procedure AddHeader(const pHeaderTitle, pHeaderValue: string);
   end;
 
 function Get(const pURL: string; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
@@ -44,13 +43,6 @@ begin
   FCountHeader    := 0;
 end;
 
-procedure THttpRequest.AddHeader(const pHeaderTitle, pHeaderValue: string);
-begin
-  FHeaderTitle := FHeaderTitle + pHeaderTitle + ';';
-  FHeaderValue := FHeaderValue + pHeaderValue + ';';
-  Inc(FCountHeader);
- end;
-
 function THttpRequest.Execute: string;
 var
   Request: OleVariant;
@@ -61,22 +53,6 @@ begin
   try
     Request := CreateOleObject('WinHttp.WinHttpRequest.5.1');
     Request.Open(FMethod, FUrl, (not FEsperaRetorno));
-    if FCountHeader > 0 then
-    begin
-      HeaderTitulo := TStringList.Create;
-      HeaderValor := TStringList.Create;
-      try
-        HeaderTitulo.Delimiter := ';';
-        HeaderTitulo.DelimitedText := FHeaderTitle;
-        HeaderValor.Delimiter := ';';
-        HeaderValor.DelimitedText := FHeaderValue;
-        for i := 0 to FCountHeader - 1 do
-          Request.SetRequestHeader(Trim(HeaderTitulo.Strings[i]), Trim(HeaderValor.Strings[i]));
-      finally
-        HeaderTitulo.Free;
-        HeaderValor.Free;
-      end;
-    end;
     Request.SetRequestHeader('Content-Type', FContentType);
     Request.Send(FBody);
     if not FEsperaRetorno then
@@ -110,7 +86,6 @@ begin
     HttpRequest.Free;
   end;
 end;
-
 function Post(const pURL, pBody: String; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
 var
   HttpRequest: THttpRequest;
@@ -122,7 +97,6 @@ begin
     HttpRequest.Free;
   end;
 end;
-
 function Put(const pURL, pBody: string; pContentType: string = 'application/json'; pEsperaRetorno: boolean = True): string;
 var
   HttpRequest: THttpRequest;
