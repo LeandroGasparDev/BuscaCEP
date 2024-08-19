@@ -3,8 +3,8 @@ unit uCEP;
 interface
 
 uses
-  Vcl.Forms, Vcl.Dialogs, superobject, Vcl.Buttons,
-  Vcl.Mask, Vcl.Controls, System.Classes, Vcl.StdCtrls;
+  Vcl.Forms, Vcl.Dialogs, superobject, Vcl.Buttons, Vcl.Mask, Vcl.Controls, System.Classes, Vcl.StdCtrls,
+  System.SysUtils, System.JSON;
 
 type
   TfrmBuscaCep = class(TForm)
@@ -26,16 +26,18 @@ implementation
 
 {$R *.dfm}
 
-uses uFuncoes, uHttpRequest;
+uses uFuncoes, uHttpRequest ;
 
 procedure TfrmBuscaCep.btnBuscarCepClick(Sender: TObject);
 var
-  CEP, url     : String;
-  Response     : TResponse;
-  objRetorno   : ISuperObject;
+  vstrCEP,
+  vstrUrl,
+  vstrJSON  : String;
+  Response  : TResponse;
+  JSONObj   : TJSONObject;
 begin
-  CEP := ApenasNumeros(edtCEP.Text);
-  if CEP = '' then
+  vstrCEP := ApenasNumeros(edtCEP.Text);
+  if vstrCEP = '' then
   begin
     ShowMessage('Informe o CEP!');
     edtCEP.SetFocus;
@@ -43,10 +45,10 @@ begin
     Exit;
   end;
 
-  url := 'https://viacep.com.br/ws/'+CEP+'/'+'json'+'/';
+  vstrUrl := 'https://viacep.com.br/ws/'+vstrCEP+'/'+'json'+'/';
   try
      Response := THttpRequest.New
-                             .SetUrl(url)
+                             .SetUrl(vstrUrl)
                              .SetMethod(mmGet)
                              .SetContentType('application/json')
                              .SetEsperaRetorno(True)
@@ -54,12 +56,20 @@ begin
                            //.Headers.Add('Header', 'HeaderValor')
                              .Execute;
 
-    objRetorno    := SO(Utf8ToAnsi(Response.ResponseText));
-    mmResult.Text := (objRetorno.AsJSon(True));
-  finally
-
+    vstrJSON := Utf8ToAnsi(Response.ResponseText);
+    JSONObj := TJSONObject.ParseJSONValue(vstrJSON) as TJSONObject;
+    try
+      if Assigned(JSONObj) then
+        mmResult.Text := JSONObj.Format
+      else
+        ShowMessage('Resposta inválida ou erro ao parsear JSON.');
+    finally
+      JSONObj.Free;
+    end;
+  except
+    on E: Exception do
+      ShowMessage('Erro ao realizar a requisição: ' + E.Message);
   end;
 end;
-
 
 end.
