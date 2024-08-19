@@ -3,7 +3,7 @@ unit uCEP;
 interface
 
 uses
-  Vcl.Forms, Vcl.Dialogs, superobject, Vcl.Buttons, Vcl.Mask, Vcl.Controls, System.Classes, Vcl.StdCtrls,
+  Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.Mask, Vcl.Controls, System.Classes, Vcl.StdCtrls,
   System.SysUtils, System.JSON;
 
 type
@@ -34,7 +34,7 @@ var
   vstrUrl,
   vstrJSON  : String;
   Response  : TResponse;
-  JSONObj   : TJSONObject;
+  vobjJSON   : TJSONObject;
 begin
   vstrCEP := ApenasNumeros(edtCEP.Text);
   if vstrCEP = '' then
@@ -57,14 +57,14 @@ begin
                              .Execute;
 
     vstrJSON := Utf8ToAnsi(Response.ResponseText);
-    JSONObj := TJSONObject.ParseJSONValue(vstrJSON) as TJSONObject;
+    vobjJSON := TJSONObject.ParseJSONValue(vstrJSON) as TJSONObject;
     try
-      if Assigned(JSONObj) then
-        mmResult.Text := JSONObj.Format
+      if Assigned(vobjJSON) then
+        mmResult.Text := vobjJSON.Format
       else
         ShowMessage('Resposta inválida ou erro ao parsear JSON.');
     finally
-      JSONObj.Free;
+      vobjJSON.Free;
     end;
   except
     on E: Exception do
