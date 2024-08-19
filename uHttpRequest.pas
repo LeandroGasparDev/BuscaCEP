@@ -202,7 +202,6 @@ begin
     Request.Open(HttpMethodToString(FMethod), FUrl, (not FEsperaRetorno));
     Request.SetRequestHeader('Content-Type', FContentType);
 
-//     Adiciona todos os headers configurados na subclasse
     for HeaderName in FHeaders.GetHeaderNames do
       Request.SetRequestHeader(HeaderName, FHeaders.Get(HeaderName));
 
@@ -211,7 +210,6 @@ begin
     if not FEsperaRetorno then
       Exit;
 
- // Cria e preenche o objeto TResponse
     Response := TResponse.Create;
     try
       Response.ResponseCode := Request.Status;
@@ -229,7 +227,7 @@ begin
 
             // Verifica se o header já existe
             if Response.Headers.ContainsKey(HeaderName) then
-              Response.Headers[HeaderName] := Response.Headers[HeaderName] + ', ' + HeaderValue;
+              Response.Headers[HeaderName] := Response.Headers[HeaderName] + ', ' + HeaderValue
             else
               Response.Headers.Add(HeaderName, HeaderValue);
           end;
