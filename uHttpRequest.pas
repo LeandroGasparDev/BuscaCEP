@@ -6,22 +6,22 @@ uses
   System.SysUtils, System.Classes, Winapi.ActiveX, Winapi.WinInet, System.Variants,  System.Win.ComObj;
 
 type
+ THttpMethod = (mmGet, mmPost, mmPut, mmDelete);
+
+
   THttpRequest = class
   private
     FUrl          : string;
-    FMethod       : string;
+    FMethod       : THttpMethod;
     FBody         : string;
     FContentType  : string;
-    FHeaderTitle  : string;
-    FHeaderValue  : string;
-    FCountHeader  : Integer;
     FEsperaRetorno: Boolean;
     FCodeApi      : Integer;
     function GetResponseText: string;
   public
     property ResponseText: string read GetResponseText;
     property CodeApi: Integer read FCodeApi;
-    constructor Create(const pURL: string; const pMethod: string; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
+    constructor Create(const pURL: string; const pMethod: THttpMethod; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
     function Execute: string;
   end;
 
@@ -33,20 +33,18 @@ implementation
 
 { THttpRequest }
 
-constructor THttpRequest.Create(const pURL: string; const pMethod: string; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
+constructor THttpRequest.Create(const pURL: string; const pMethod: THttpMethod; const pBody: string; const pContentType: string = ''; pEsperaRetorno: boolean = True);
 begin
   FUrl            := pURL;
   FMethod         := pMethod;
   FBody           := pBody;
   FContentType    := pContentType;
   FEsperaRetorno  := pEsperaRetorno;
-  FCountHeader    := 0;
 end;
 
 function THttpRequest.Execute: string;
 var
   Request: OleVariant;
-  HeaderTitulo, HeaderValor: TStringList;
   i: Integer;
 begin
   CoInitialize(nil);
@@ -62,7 +60,7 @@ begin
       FCodeApi := 200
     else
       FCodeApi := Request.Status;
-    Result := Request.ResponseText;
+    Result     := Request.ResponseText;
   finally
     Request := Unassigned;
     CoUninitialize;
@@ -79,7 +77,7 @@ function Get(const pURL: string; pContentType: string = 'application/json'; pEsp
 var
   HttpRequest: THttpRequest;
 begin
-  HttpRequest := THttpRequest.Create(pURL, 'GET', '', pContentType, pEsperaRetorno);
+  HttpRequest := THttpRequest.Create(pURL, mmGet, '', pContentType, pEsperaRetorno);
   try
     Result := HttpRequest.Execute;
   finally
@@ -90,7 +88,7 @@ function Post(const pURL, pBody: String; pContentType: string = 'application/jso
 var
   HttpRequest: THttpRequest;
 begin
-  HttpRequest := THttpRequest.Create(pURL, 'POST', pBody, pContentType, pEsperaRetorno);
+  HttpRequest := THttpRequest.Create(pURL, mmPost, pBody, pContentType, pEsperaRetorno);
   try
     Result := HttpRequest.Execute;
   finally
@@ -101,7 +99,7 @@ function Put(const pURL, pBody: string; pContentType: string = 'application/json
 var
   HttpRequest: THttpRequest;
 begin
-  HttpRequest := THttpRequest.Create(pURL, 'PUT', pBody, pContentType, pEsperaRetorno);
+  HttpRequest := THttpRequest.Create(pURL, mmPut, pBody, pContentType, pEsperaRetorno);
   try
     Result := HttpRequest.Execute;
   finally
