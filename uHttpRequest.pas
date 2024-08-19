@@ -63,12 +63,12 @@ implementation
 function HttpMethodToString(Method: THttpMethod): string;
 begin
   case Method of
-    mmGet   : Result := 'GET';
-    mmPost  : Result := 'POST';
-    mmPut   : Result := 'PUT';
-    mmDelete: Result := 'DELETE';
+    mmGet     : Result := 'GET';
+    mmPost    : Result := 'POST';
+    mmPut     : Result := 'PUT';
+    mmDelete  : Result := 'DELETE';
   else
-    Result := 'GET';
+    Result    := 'GET';
   end;
 end;
 
@@ -102,21 +102,21 @@ end;
 function THeaders.Add(const Name, Value: string): THeaders;
 begin
   FHeaders.AddOrSetValue(Name, Value);
-  Result := Self;
+  Result  := Self;
 end;
 
 function THeaders.Remove(const Name: string): THeaders;
 begin
   FHeaders.Remove(Name);
-  Result := Self;
+  Result  := Self;
 end;
 
 function THeaders.Get(const Name: string): string;
 begin
   if FHeaders.ContainsKey(Name) then
-    Result := FHeaders[Name]
+    Result  := FHeaders[Name]
   else
-    Result := '';
+    Result  := '';
 end;
 
 function THeaders.Count: Integer;
@@ -134,8 +134,7 @@ end;
 
 constructor THttpRequest.Create;
 begin
-  FHeaders := THeaders.Create;
-
+  FHeaders        := THeaders.Create;
   FUrl            := '';
   FMethod         := mmGet;
   FBody           := '';
