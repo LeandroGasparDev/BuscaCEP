@@ -45,7 +45,8 @@ type
     function SetBody(const pBody: string): THttpRequest;
     function SetContentType(const pContentType: string): THttpRequest;
     function SetEsperaRetorno(pEsperaRetorno: Boolean): THttpRequest;
-    function Execute: string;  end;
+    function Execute: string;
+  end;
 
 implementation
 
