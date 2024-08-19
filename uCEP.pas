@@ -46,13 +46,13 @@ begin
   url := 'https://viacep.com.br/ws/'+CEP+'/'+'json'+'/';
   try
      Response := THttpRequest.New
-              .SetUrl(url)
-              .SetMethod(mmGet)
-              .SetContentType('application/json')
-              .SetEsperaRetorno(True)
-            //.Headers.Add('Authorization', 'Bearer token_aqui')
-            //.Headers.Add('Header', 'HeaderValor')
-              .Execute;
+                             .SetUrl(url)
+                             .SetMethod(mmGet)
+                             .SetContentType('application/json')
+                             .SetEsperaRetorno(True)
+                           //.Headers.Add('Authorization', 'Bearer token_aqui')
+                           //.Headers.Add('Header', 'HeaderValor')
+                             .Execute;
 
     objRetorno    := SO(Utf8ToAnsi(Response));
     mmResult.Text := (objRetorno.AsJSon(True));
