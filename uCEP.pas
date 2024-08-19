@@ -31,7 +31,7 @@ uses uFuncoes, uHttpRequest;
 procedure TfrmBuscaCep.btnBuscarCepClick(Sender: TObject);
 var
   CEP, url     : String;
-  Response     : string;
+  Response     : TResponse;
   objRetorno   : ISuperObject;
 begin
   CEP := ApenasNumeros(edtCEP.Text);
@@ -54,7 +54,7 @@ begin
                            //.Headers.Add('Header', 'HeaderValor')
                              .Execute;
 
-    objRetorno    := SO(Utf8ToAnsi(Response));
+    objRetorno    := SO(Utf8ToAnsi(Response.ResponseText));
     mmResult.Text := (objRetorno.AsJSon(True));
   finally
 

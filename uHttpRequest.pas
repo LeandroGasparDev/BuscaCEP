@@ -8,6 +8,19 @@ uses
 type
  THttpMethod = (mmGet, mmPost, mmPut, mmDelete);
 
+type
+  TResponse = class
+  private
+    FResponseCode: Integer;
+    FResponseText: string;
+    FHeaders: TDictionary<string, string>;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property ResponseCode: Integer read FResponseCode write FResponseCode;
+    property ResponseText: string read FResponseText write FResponseText;
+    property Headers: TDictionary<string, string> read FHeaders write FHeaders;
+  end;
 
 type
   THeaders = class
@@ -32,10 +45,7 @@ type
     FHeaders: THeaders;
     FEsperaRetorno: Boolean;
     FCodeApi: Integer;
-    function GetResponseText: string;
   public
-    property ResponseText: string read GetResponseText;
-    property CodeApi: Integer read FCodeApi;
     property Headers: THeaders read FHeaders;
     constructor Create;
     destructor Destroy; override;
@@ -45,7 +55,7 @@ type
     function SetBody(const pBody: string): THttpRequest;
     function SetContentType(const pContentType: string): THttpRequest;
     function SetEsperaRetorno(pEsperaRetorno: Boolean): THttpRequest;
-    function Execute: string;
+    function Execute: TResponse;
   end;
 
 implementation
@@ -62,7 +72,22 @@ begin
   end;
 end;
 
+{ TResponse }
+
+constructor TResponse.Create;
+begin
+ FHeaders := TDictionary<string, string>.Create;
+end;
+
+destructor TResponse.Destroy;
+begin
+  FHeaders.Free;
+  inherited;
+end;
+
+
 { THeaders }
+
 constructor THeaders.Create;
 begin
   FHeaders := TDictionary<string, string>.Create;
@@ -106,11 +131,6 @@ end;
 
 
 { THttpRequest }
-
-function THttpRequest.GetResponseText: string;
-begin
- Result := Execute;
-end;
 
 constructor THttpRequest.Create;
 begin
@@ -165,10 +185,13 @@ begin
   Result := Self;
 end;
 
-function THttpRequest.Execute: string;
+function THttpRequest.Execute: TResponse;
 var
   Request: OleVariant;
-  HeaderName: string;
+  HeaderName, HeaderValue: string;
+  Response: TResponse;
+  i: Integer;
+  HeaderLines : TStringList;
 begin
   CoInitialize(nil);
   try
@@ -188,16 +211,45 @@ begin
     if not FEsperaRetorno then
       Exit;
 
-    if Request.Status < 205 then
-      FCodeApi := 200
-    else
-      FCodeApi := Request.Status;
-    Result := Request.ResponseText;
+ // Cria e preenche o objeto TResponse
+    Response := TResponse.Create;
+    try
+      Response.ResponseCode := Request.Status;
+      Response.ResponseText := Request.ResponseText;
+
+      HeaderLines := TStringList.Create;
+      try
+        HeaderLines.Text := StringReplace(Request.GetAllResponseHeaders, #13#10, #10, [rfReplaceAll]);
+        for i := 0 to HeaderLines.Count - 1 do
+        begin
+          if Pos(': ', HeaderLines[i]) > 0 then
+          begin
+            HeaderName := Trim(Copy(HeaderLines[i], 1, Pos(':', HeaderLines[i]) - 1));
+            HeaderValue := Trim(Copy(HeaderLines[i], Pos(':', HeaderLines[i]) + 2, Length(HeaderLines[i])));
+
+            // Verifica se o header já existe
+            if Response.Headers.ContainsKey(HeaderName) then
+              Response.Headers[HeaderName] := Response.Headers[HeaderName] + ', ' + HeaderValue;
+            else
+              Response.Headers.Add(HeaderName, HeaderValue);
+          end;
+        end;
+      finally
+        HeaderLines.Free;
+      end;
+
+      Result := Response;
+    except
+      Response.Free;
+      raise;
+    end;
+
   finally
     Request := Unassigned;
     CoUninitialize;
   end;
 end;
+
 
 
 end.
