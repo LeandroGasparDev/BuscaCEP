@@ -115,6 +115,13 @@ end;
 constructor THttpRequest.Create;
 begin
   FHeaders := THeaders.Create;
+
+  FUrl            := '';
+  FMethod         := mmGet;
+  FBody           := '';
+  FContentType    := '';
+  FEsperaRetorno  := True;
+  FCodeApi        := 0;
 end;
 
 destructor THttpRequest.Destroy;
@@ -165,6 +172,9 @@ var
 begin
   CoInitialize(nil);
   try
+    if FUrl = '' then
+      raise Exception.Create('URL não pode ser vazia.');
+
     Request := CreateOleObject('WinHttp.WinHttpRequest.5.1');
     Request.Open(HttpMethodToString(FMethod), FUrl, (not FEsperaRetorno));
     Request.SetRequestHeader('Content-Type', FContentType);
