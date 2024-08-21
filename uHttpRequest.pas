@@ -82,7 +82,6 @@ end;
 destructor TResponse.Destroy;
 begin
   FHeaders.Free;
-
   inherited;
 end;
 
@@ -92,7 +91,6 @@ end;
 constructor THeaders.Create;
 begin
   FHeaders := TDictionary<string, string>.Create;
-
 end;
 
 destructor THeaders.Destroy;
