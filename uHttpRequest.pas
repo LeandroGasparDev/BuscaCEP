@@ -13,7 +13,7 @@ type
   private
     FResponseCode: Integer;
     FResponseText: string;
-    FHeaders: TDictionary<string, string>;
+    FHeaders     : TDictionary<string, string>;
   public
     constructor Create;
     destructor Destroy; override;
