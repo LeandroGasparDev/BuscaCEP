@@ -92,6 +92,7 @@ end;
 constructor THeaders.Create;
 begin
   FHeaders := TDictionary<string, string>.Create;
+
 end;
 
 destructor THeaders.Destroy;
