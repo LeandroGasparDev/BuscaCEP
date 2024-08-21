@@ -34,7 +34,7 @@ var
   vstrUrl,
   vstrJSON  : String;
   Response  : TResponse;
-  vobjJSON   : TJSONObject;
+  vobjJSON  : TJSONObject;
 begin
   vstrCEP := ApenasNumeros(edtCEP.Text);
   if vstrCEP = '' then

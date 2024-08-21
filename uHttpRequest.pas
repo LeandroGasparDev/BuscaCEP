@@ -82,7 +82,6 @@ end;
 destructor TResponse.Destroy;
 begin
   FHeaders.Free;
-
   inherited;
 end;
 
