@@ -47,8 +47,10 @@ type
     FCodeApi: Integer;
   public
     property Headers: THeaders read FHeaders;
+
     constructor Create;
     destructor Destroy; override;
+
     class function New: THttpRequest;
     function SetUrl(const pURL: string): THttpRequest;
     function SetMethod(const pMethod: THttpMethod): THttpRequest;
