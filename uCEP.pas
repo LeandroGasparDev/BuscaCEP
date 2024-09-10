@@ -4,7 +4,7 @@ interface
 
 uses
   Vcl.Forms, Vcl.Dialogs, Vcl.Buttons, Vcl.Mask, Vcl.Controls, System.Classes, Vcl.StdCtrls,
-  System.SysUtils, System.JSON;
+  System.SysUtils, System.JSON, System.StrUtils, system.Math ;
 
 type
   TfrmBuscaCep = class(TForm)
@@ -35,6 +35,7 @@ var
   vstrJSON  : String;
   Response  : TResponse;
   vobjJSON  : TJSONObject;
+  vRequest  : THttpRequest;
 begin
   vstrCEP := ApenasNumeros(edtCEP.Text);
   if vstrCEP = '' then
@@ -47,17 +48,28 @@ begin
 
   vstrUrl := 'https://viacep.com.br/ws/'+vstrCEP+'/'+'json'+'/';
   try
-     Response := THttpRequest.New
-                             .SetUrl(vstrUrl)
-                             .SetMethod(mmGet)
-                             .SetContentType('application/json')
-                             .SetEsperaRetorno(True)
-                           //.Headers.Add('Authorization', 'Bearer token_aqui')
-                           //.Headers.Add('Header', 'HeaderValor')
-                             .Execute;
+    try
+      vRequest  := THttpRequest.New
+                               .SetUrl(vstrUrl)
+                               .SetMethod(mmGet)
+                               .SetContentType('application/json')
+                               .SetEsperaRetorno(True);
+      with vRequest do
+      begin
+        FormData.AddField('FieldName','FieldValue');
+        FormData.AddField('FieldName','FieldValue');
+        FormData.AddField('FieldName','FieldValue');
+        FormData.AddField('FieldName','FieldValue');
+        FormData.AddField('FieldName','FieldValue');
+      end;
+      Response := vRequest.Execute;
 
-    vstrJSON := Utf8ToAnsi(Response.ResponseText);
-    vobjJSON := TJSONObject.ParseJSONValue(vstrJSON) as TJSONObject;
+      vstrJSON := Utf8ToAnsi(Response.ResponseText);
+      vobjJSON := TJSONObject.ParseJSONValue(vstrJSON) as TJSONObject;
+    finally
+      Response.Free;
+    end;
+
     try
       if Assigned(vobjJSON) then
         mmResult.Text := vobjJSON.Format
